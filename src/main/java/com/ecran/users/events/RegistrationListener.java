@@ -5,16 +5,16 @@ import com.ecran.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 
 @Component
-public class RegistrationListener implements
-        ApplicationListener<OnRegistrationCompleteEvent> {
-
+public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
     @Autowired
     private UserService service;
 
@@ -31,19 +31,18 @@ public class RegistrationListener implements
 
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
         UserEntity user = event.getUser();
-        String token = UUID.randomUUID().toString();
-        service.createVerificationToken(user, token);
-
         String recipientAddress = user.getEmail();
-        String subject = "Registration Confirmation";
-        String confirmationUrl
-                = event.getAppUrl() + "/regitrationConfirm?token=" + token;
-        String message = messages.getMessage("message.regSucc", null, event.getLocale());
+        String subject = "ECRAN: Verifique su mail";
+        String confirmationUrl = event.getAppUrl() + "/users/confirm?token=" + user.getUserId();
 
         SimpleMailMessage email = new SimpleMailMessage();
+//        MimeMessage msg= new MimeMessage();
         email.setTo(recipientAddress);
         email.setSubject(subject);
-        email.setText(message + "\r\n" + "http://localhost:8080" + confirmationUrl);
+//        email.setContent()
+//        email.setContentType()
+        email.setText("Muchas gracias por registrarte en Ecran.lat! Por favor, verifica tu mail." + "\r\n" + "http://localhost:8082" + confirmationUrl);
+//        email.setText("<html><body><h1>¡Hola!</h1><p>Este es un correo con formato HTML.</p></body></html>" + "http://localhost:8082" + confirmationUrl);
         mailSender.send(email);
     }
 }

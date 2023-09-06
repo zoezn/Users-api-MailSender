@@ -2,9 +2,7 @@ package com.ecran.users.services;
 
 import com.ecran.users.entity.UserDto;
 import com.ecran.users.entity.UserEntity;
-import com.ecran.users.entity.VerificationToken;
 import com.ecran.users.repository.UserRepository;
-import com.ecran.users.repository.VerificationTokenRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
@@ -16,15 +14,11 @@ import org.springframework.core.env.Environment;
 //import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private VerificationTokenRepository tokenRepository;
     UserRepository usersRepository;
 
     Environment environment;
@@ -63,22 +57,11 @@ public class UserService {
         return returnValue;
     }
 
-
-
-//    @Override
-    public VerificationToken getVerificationToken(String VerificationToken) {
-        return tokenRepository.findByToken(VerificationToken);
+    public UserEntity enableUser(String id) {
+        UserEntity foundUser = usersRepository.findByUserId(id);
+        foundUser.setEnabled(true);
+        UserEntity saved =  usersRepository.save(foundUser);
+        return saved;
     }
 
-//    @Override
-    public void createVerificationToken(UserEntity user, String token) {
-        VerificationToken myToken = new VerificationToken(token, user);
-        tokenRepository.save(myToken);
-    }
-
-//    @Override
-    public UserEntity getUser(String verificationToken) {
-        UserEntity user = tokenRepository.findByToken(verificationToken).getUser();
-        return user;
-    }
 }
